@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Жасанды интеллект негізінде физика пәнін оқыту</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6f0;
+    --beige: #f0e8d8;
+    --beige-mid: #e8dcc8;
+    --beige-dark: #d4c4a8;
+    --brown-light: #c8b090;
+    --brown: #8b6f47;
+    --brown-dark: #5c4a2a;
+    --navy: #2a3558;
+    --navy-mid: #3d4f7a;
+    --navy-light: #5a6e9e;
+    --text-dark: #2a2018;
+    --text-mid: #4a3c28;
+    --text-light: #7a6a50;
+    --white: #ffffff;
+    --shadow: 0 4px 24px rgba(90,60,20,0.10);
+    --shadow-hover: 0 8px 40px rgba(90,60,20,0.18);
+    --sidebar-w: 240px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:'Nunito',sans-serif; background:var(--cream); color:var(--text-dark); line-height:1.7; display:flex; flex-direction:column; min-height:100vh; }
+
+  .topbar { background:var(--navy); color:rgba(255,255,255,0.72); text-align:center; padding:9px 20px; font-size:12px; letter-spacing:0.4px; flex-shrink:0; }
+
+  .layout { display:flex; flex:1; min-height:0; }
+
+  /* SIDEBAR */
+  .sidebar { width:var(--sidebar-w); flex-shrink:0; background:var(--white); border-right:1px solid var(--beige-mid); position:sticky; top:0; height:100vh; overflow-y:auto; display:flex; flex-direction:column; box-shadow:2px 0 16px rgba(90,60,20,0.06); z-index:50; }
+  .sidebar-brand { padding:22px 20px 16px; border-bottom:1px solid var(--beige-mid); }
+  .sidebar-brand-title { font-family:'Playfair Display',serif; font-size:13px; font-weight:700; color:var(--navy); line-height:1.4; margin-bottom:3px; }
+  .sidebar-brand-sub { font-size:11px; color:var(--text-light); }
+  .sidebar-nav { padding:14px 10px; flex:1; }
+  .sidebar-section-label { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--brown-light); font-weight:700; padding:0 10px; margin:14px 0 5px; }
+  .sidebar-section-label:first-child { margin-top:0; }
+  .nav-item { display:flex; align-items:center; gap:9px; padding:9px 12px; border-radius:10px; cursor:pointer; font-size:13.5px; font-weight:500; color:var(--text-mid); transition:background 0.2s,color 0.2s; text-decoration:none; margin-bottom:2px; }
+  .nav-item:hover { background:var(--beige); color:var(--navy); }
+  .nav-item.active { background:var(--navy); color:#fff; font-weight:600; }
+  .nav-icon { font-size:15px; opacity:0.75; flex-shrink:0; }
+  .nav-item.active .nav-icon { opacity:1; }
+  .nav-item-task { display:flex; align-items:center; gap:8px; padding:7px 12px; border-radius:8px; cursor:pointer; font-size:12.5px; font-weight:500; color:var(--text-mid); transition:background 0.2s,color 0.2s; text-decoration:none; margin-bottom:1px; }
+  .nav-item-task:hover { background:var(--beige); color:var(--navy); }
+  .nav-item-task.active { background:var(--beige-mid); color:var(--navy); font-weight:700; }
+  .task-num-badge { width:20px; height:20px; border-radius:50%; background:var(--beige-mid); color:var(--navy); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .nav-item-task.active .task-num-badge { background:var(--navy); color:#fff; }
+  .sidebar-footer { padding:14px 20px; border-top:1px solid var(--beige-mid); font-size:11px; color:var(--text-light); line-height:1.5; }
+
+  /* MAIN */
+  .main { flex:1; overflow-y:auto; min-width:0; }
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* HERO */
+  .hero { background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 50%,#4a5f8a 100%); min-height:460px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:68px 48px 52px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+  .hero-icon { width:66px; height:66px; border-radius:50%; background:rgba(255,255,255,0.12); border:2px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:29px; margin-bottom:22px; }
+  .hero-univ { font-size:10.5px; color:rgba(255,255,255,0.58); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:5px; }
+  .hero-title-small { font-size:14px; color:rgba(255,255,255,0.88); font-weight:700; margin-bottom:4px; }
+  .hero-dept { font-size:12px; color:rgba(255,255,255,0.58); margin-bottom:28px; }
+  .hero-main { font-family:'Playfair Display',serif; font-size:clamp(24px,3.2vw,42px); font-weight:700; color:#fff; line-height:1.25; margin-bottom:10px; }
+  .hero-sub { font-size:11.5px; color:rgba(255,255,255,0.62); letter-spacing:2px; text-transform:uppercase; margin-bottom:30px; }
+  .hero-tags { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .hero-tag { background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.9); padding:7px 16px; border-radius:100px; font-size:12.5px; font-weight:500; }
+
+  /* SECTIONS */
+  .section { padding:56px 48px; max-width:920px; }
+  .section-label { font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:var(--brown); font-weight:700; margin-bottom:9px; }
+  .section-title { font-family:'Playfair Display',serif; font-size:clamp(22px,2.6vw,32px); font-weight:700; color:var(--navy); margin-bottom:6px; }
+  .section-title-line { width:44px; height:3px; background:var(--brown); border-radius:2px; margin-bottom:34px; }
+
+  /* CARDS */
+  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .card { background:var(--white); border:1px solid var(--beige-mid); border-radius:16px; padding:26px; box-shadow:var(--shadow); transition:box-shadow 0.3s,transform 0.3s; }
+  .card:hover { box-shadow:var(--shadow-hover); transform:translateY(-3px); }
+  .card-title { font-size:11.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--navy); font-weight:700; margin-bottom:13px; display:flex; align-items:center; gap:10px; }
+  .card-title::before { content:''; display:block; width:4px; height:17px; background:var(--brown); border-radius:2px; flex-shrink:0; }
+  .card p { color:var(--text-mid); font-size:14px; line-height:1.75; }
+  .task-chips { display:flex; flex-direction:column; gap:7px; }
+  .task-chip { background:var(--beige); border:1px solid var(--beige-dark); border-radius:8px; padding:9px 13px; font-size:13px; color:var(--text-mid); font-weight:500; }
+  .tool-chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .tool-chip { background:var(--navy); color:#fff; padding:6px 15px; border-radius:100px; font-size:12.5px; font-weight:600; }
+
+  /* TASK LIST */
+  .tasks-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:18px; }
+  .task-card { background:var(--white); border-radius:17px; border:1px solid var(--beige-mid); box-shadow:var(--shadow); overflow:hidden; transition:box-shadow 0.3s,transform 0.3s; cursor:pointer; }
+  .task-card:hover { box-shadow:var(--shadow-hover); transform:translateY(-4px); }
+  .task-card-header { background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%); padding:20px 20px 16px; display:flex; justify-content:space-between; align-items:flex-start; }
+  .task-num { width:33px; height:33px; border-radius:50%; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; }
+  .task-week { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.9); padding:4px 11px; border-radius:100px; font-size:11px; font-weight:600; }
+  .task-card-icon { font-size:30px; margin-top:9px; }
+  .task-card-body { padding:20px; }
+  .task-card-name { font-family:'Playfair Display',serif; font-size:14.5px; font-weight:600; color:var(--navy); margin-bottom:10px; line-height:1.4; }
+  .task-type-tag { display:inline-block; background:var(--beige); border:1px solid var(--beige-dark); border-radius:6px; padding:3px 10px; font-size:11.5px; color:var(--text-mid); font-weight:600; margin-bottom:10px; }
+  .task-card-result { font-size:12.5px; color:var(--text-light); line-height:1.5; border-top:1px solid var(--beige); padding-top:10px; margin-top:2px; }
+  .open-detail-btn { display:block; text-align:center; background:var(--navy); color:#fff; padding:10px; border-radius:9px; font-size:13px; font-weight:600; margin-top:13px; transition:background 0.2s; border:none; width:100%; cursor:pointer; font-family:'Nunito',sans-serif; }
+  .open-detail-btn:hover { background:var(--navy-light); }
+
+  /* TASK DETAIL */
+  .task-page-header { background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%); padding:42px 48px 34px; }
+  .task-page-nav { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .back-btn { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.9); padding:6px 14px; border-radius:100px; font-size:13px; font-weight:600; cursor:pointer; transition:background 0.2s; font-family:'Nunito',sans-serif; }
+  .back-btn:hover { background:rgba(255,255,255,0.25); }
+  .task-page-crumb { color:rgba(255,255,255,0.5); font-size:13px; }
+  .task-page-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.85); padding:5px 14px; border-radius:100px; font-size:12px; font-weight:600; margin-bottom:10px; }
+  .task-page-icon { font-size:38px; margin-bottom:10px; }
+  .task-page-title { font-family:'Playfair Display',serif; font-size:clamp(19px,2.3vw,28px); font-weight:700; color:#fff; line-height:1.3; }
+  .task-page-body { padding:38px 48px; max-width:860px; }
+  .meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:22px; }
+  .meta-block { background:var(--white); border:1px solid var(--beige-mid); border-radius:13px; padding:18px 20px; box-shadow:var(--shadow); }
+  .meta-block-label { font-size:10.5px; letter-spacing:1.2px; text-transform:uppercase; color:var(--brown); font-weight:700; margin-bottom:7px; }
+  .meta-block-val { font-size:13.5px; color:var(--text-mid); line-height:1.65; }
+  .result-box { background:var(--beige); border:1px solid var(--beige-dark); border-left:4px solid var(--brown); border-radius:11px; padding:16px 18px; font-size:13.5px; color:var(--text-mid); line-height:1.65; margin-bottom:22px; }
+  .open-link-btn { display:inline-flex; align-items:center; gap:8px; background:var(--navy); color:#fff; padding:12px 26px; border-radius:11px; text-decoration:none; font-size:14px; font-weight:700; transition:background 0.2s,transform 0.15s; box-shadow:0 4px 16px rgba(42,53,88,0.22); }
+  .open-link-btn:hover { background:var(--navy-light); transform:translateY(-2px); }
+
+  /* RESEARCH */
+  .research-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:32px; }
+  .research-card { background:var(--white); border-radius:15px; padding:24px; border:1px solid var(--beige-mid); box-shadow:var(--shadow); }
+  .research-card-header { display:flex; align-items:center; gap:10px; margin-bottom:15px; }
+  .research-card-icon { font-size:21px; }
+  .research-card-title { font-size:14px; font-weight:700; color:var(--navy); }
+  .research-items { display:flex; flex-direction:column; gap:7px; }
+  .research-item { background:var(--beige); border:1px solid var(--beige-dark); border-radius:8px; padding:9px 13px; font-size:13px; color:var(--text-mid); }
+  .compare-table-wrap { overflow-x:auto; border-radius:13px; box-shadow:var(--shadow); border:1px solid var(--beige-mid); }
+  .compare-table { width:100%; border-collapse:collapse; background:var(--white); }
+  .compare-table th { background:var(--navy); color:#fff; padding:13px 17px; text-align:left; font-size:11px; letter-spacing:1px; text-transform:uppercase; font-weight:700; }
+  .compare-table td { padding:12px 17px; border-bottom:1px solid var(--beige); font-size:13px; color:var(--text-mid); vertical-align:middle; }
+  .compare-table tr:last-child td { border-bottom:none; }
+  .compare-table tr:hover td { background:var(--beige); }
+  .tool-badge { display:inline-block; padding:4px 11px; border-radius:6px; font-size:11.5px; font-weight:700; background:var(--beige-mid); color:var(--navy); }
+  .stars { color:#e8a020; font-size:14px; letter-spacing:2px; }
+  .impact-box { background:var(--beige); border:1px solid var(--beige-dark); border-radius:13px; padding:20px 24px; margin-bottom:28px; }
+  .impact-box-title { display:flex; align-items:center; gap:9px; font-size:13.5px; font-weight:700; color:var(--navy); margin-bottom:9px; }
+  .impact-box p { font-size:13.5px; color:var(--text-mid); line-height:1.75; }
+
+  /* CONCLUSION */
+  .conclusion-section { padding:56px 48px; background:var(--beige); }
+  .conclusion-box { background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%); border-radius:22px; padding:54px 44px; text-align:center; box-shadow:0 12px 48px rgba(42,53,88,0.25); }
+  .conclusion-icon { font-size:44px; margin-bottom:16px; }
+  .conclusion-title { font-family:'Playfair Display',serif; font-size:clamp(19px,2.3vw,29px); font-weight:700; color:#fff; margin-bottom:13px; }
+  .conclusion-text { color:rgba(255,255,255,0.8); font-size:14.5px; max-width:580px; margin:0 auto 30px; line-height:1.85; }
+  .conclusion-badges { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .conclusion-badge { background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.95); padding:9px 20px; border-radius:100px; font-size:13px; font-weight:600; }
+
+  footer { background:var(--navy); color:rgba(255,255,255,0.52); text-align:center; padding:22px 40px; font-size:12px; }
+
+  @media (max-width:700px) {
+    .sidebar { display:none; }
+    .section,.task-page-body,.conclusion-section { padding:36px 18px; }
+    .about-grid,.research-grid,.meta-grid { grid-template-columns:1fr; }
+    .hero { padding:48px 18px 42px; }
+    .task-page-header { padding:34px 18px 26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  Қазақстан Республикасы Ғылым және Жоғары білім министрлігі &nbsp;|&nbsp; Ө.Жәнібеков атындағы Оңтүстік Қазақстан педагогикалық университеті
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-title">М1502-15 · 7М01502</div>
+    <div class="sidebar-brand-sub">Физика педагогін даярлау</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Навигация</div>
+    <a class="nav-item active" onclick="showPage('home')" href="#"><span class="nav-icon">🏠</span> Басты бет</a>
+    <a class="nav-item" onclick="showPage('about')" href="#"><span class="nav-icon">📋</span> Жоба туралы</a>
+    <a class="nav-item" onclick="showPage('tasks')" href="#"><span class="nav-icon">📚</span> Тапсырмалар</a>
+
+    <div class="sidebar-section-label">Тапсырмалар</div>
+    <a class="nav-item-task" onclick="showTask(1)" href="#"><span class="task-num-badge">1</span> ЖИ технологиялары</a>
+    <a class="nav-item-task" onclick="showTask(2)" href="#"><span class="task-num-badge">2</span> Салыстыру</a>
+    <a class="nav-item-task" onclick="showTask(3)" href="#"><span class="task-num-badge">3</span> Адаптивті модель</a>
+    <a class="nav-item-task" onclick="showTask(4)" href="#"><span class="task-num-badge">4</span> Олимпиада жүйесі</a>
+    <a class="nav-item-task" onclick="showTask(5)" href="#"><span class="task-num-badge">5</span> Модельдеу</a>
+    <a class="nav-item-task" onclick="showTask(6)" href="#"><span class="task-num-badge">6</span> Атом физикасы</a>
+    <a class="nav-item-task" onclick="showTask(7)" href="#"><span class="task-num-badge">7</span> Виртуалды зертхана</a>
+    <a class="nav-item-task" onclick="showTask(8)" href="#"><span class="task-num-badge">8</span> Prompt жүйесі</a>
+
+    <div class="sidebar-section-label" style="margin-top:14px;">Зерттеу</div>
+    <a class="nav-item" onclick="showPage('research')" href="#"><span class="nav-icon">🔍</span> Зерттеу талдауы</a>
+    <a class="nav-item" onclick="showPage('conclusion')" href="#"><span class="nav-icon">🏆</span> Қорытынды</a>
+  </nav>
+  <div class="sidebar-footer">Маликова Айнамкөз Сағитқызы<br>Шымкент, 2026</div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HOME -->
+  <div id="page-home" class="page active">
+    <div class="hero">
+      <div class="hero-icon">🎓</div>
+      <div class="hero-univ">Қазақстан Республикасы Ғылым және Жоғары білім министрлігі</div>
+      <div class="hero-title-small">Ө.Жәнібеков атындағы Оңтүстік Қазақстан педагогикалық университеті</div>
+      <div class="hero-dept">Жоғары оқу орнынан кейінгі білім беру институты · Физика-математика факультеті · Физика кафедрасы</div>
+      <div class="hero-main">ЖАСАНДЫ ИНТЕЛЛЕКТ НЕГІЗІНДЕ<br>ФИЗИКА ПӘНІН ОҚЫТУ</div>
+      <div class="hero-sub">Емтихан жобасы</div>
+      <div class="hero-tags">
+        <span class="hero-tag">Орындаған: Маликова Айнамкөз Сағитқызы</span>
+        <span class="hero-tag">Бағдарлама: 7М01502 – Физика педагогін даярлау</span>
+        <span class="hero-tag">Тобы: М1502-15</span>
+        <span class="hero-tag">Шымкент – 2026</span>
+      </div>
+    </div>
+    <div style="padding:48px 48px 56px; max-width:900px;">
+      <div class="section-label">Жобаға шолу</div>
+      <div class="section-title">Қысқаша мазмұны</div>
+      <div class="section-title-line"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+        <div class="card" style="text-align:center;cursor:pointer;" onclick="showPage('tasks')">
+          <div style="font-size:30px;margin-bottom:9px;">📚</div>
+          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy);margin-bottom:4px;">8</div>
+          <div style="font-size:12.5px;color:var(--text-light);font-weight:600;">Тапсырма орындалды</div>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;" onclick="showPage('about')">
+          <div style="font-size:30px;margin-bottom:9px;">🤖</div>
+          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy);margin-bottom:4px;">5</div>
+          <div style="font-size:12.5px;color:var(--text-light);font-weight:600;">ЖИ құралы қолданылды</div>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;" onclick="showPage('conclusion')">
+          <div style="font-size:30px;margin-bottom:9px;">🌐</div>
+          <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy);margin-bottom:4px;">4</div>
+          <div style="font-size:12.5px;color:var(--text-light);font-weight:600;">Цифрлық платформа</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button onclick="showPage('tasks')" style="background:var(--navy);color:#fff;padding:11px 26px;border-radius:11px;border:none;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;" onmouseover="this.style.background='#5a6e9e'" onmouseout="this.style.background='#2a3558'">Тапсырмаларды қарау →</button>
+        <button onclick="showPage('conclusion')" style="background:var(--beige);color:var(--navy);padding:11px 26px;border-radius:11px;border:1px solid var(--beige-dark);font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;">Қорытынды</button>
+      </div>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · 7М01502 – Физика педагогін даярлау</p><p style="margin-top:4px;">Ө.Жәнібеков атындағы Оңтүстік Қазақстан педагогикалық университеті · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- ABOUT -->
+  <div id="page-about" class="page">
+    <div class="section">
+      <div class="section-label">Сипаттама</div>
+      <div class="section-title">Жоба туралы</div>
+      <div class="section-title-line"></div>
+      <div class="about-grid">
+        <div>
+          <div class="card" style="margin-bottom:18px;">
+            <div class="card-title">Жобаның мақсаты</div>
+            <p>Физика пәнін оқытуда жасанды интеллект құралдарын тиімді қолдану жолдарын зерттеу және практикалық тапсырмалар арқылы цифрлық білім беру платформасын құру.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">Қолданылған құралдар</div>
+            <div class="tool-chips">
+              <span class="tool-chip">ChatGPT</span><span class="tool-chip">Claude</span><span class="tool-chip">Canva</span><span class="tool-chip">Lovable</span><span class="tool-chip">Python / Scikit-learn</span><span class="tool-chip">Whimsical</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Жобаның міндеттері</div>
+          <div class="task-chips">
+            <div class="task-chip">ЖИ технологияларын талдау</div>
+            <div class="task-chip">Физикада ЖИ қолдану мысалдарын әзірлеу</div>
+            <div class="task-chip">Адаптивті оқыту моделін құру</div>
+            <div class="task-chip">Интерактивті есеп шығару жүйесін жасау</div>
+            <div class="task-chip">Физикалық процестерді модельдеу</div>
+            <div class="task-chip">Виртуалды зертхана жасау</div>
+            <div class="task-chip">Prompt жүйесін әзірлеу</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- TASKS LIST -->
+  <div id="page-tasks" class="page">
+    <div class="section">
+      <div class="section-label">Практикалық бөлім</div>
+      <div class="section-title">Тапсырмалар</div>
+      <div class="section-title-line"></div>
+      <div class="tasks-grid">
+        <div class="task-card" onclick="showTask(1)"><div class="task-card-header"><div><div class="task-num">1</div><div class="task-card-icon">🤖</div></div><span class="task-week">2 апта</span></div><div class="task-card-body"><div class="task-card-name">Физиканы оқытуда жасанды интеллект технологияларының рөлі</div><span class="task-type-tag">АБ1 – Прак</span><div class="task-card-result">📋 ЖИ технологияларының жіктемесі мен салыстырмалы талдауы, Canva инфографика</div><button class="open-detail-btn">Толығырақ қарау →</button></div></div>
+        <div class="task-card" onclick="showTask(2)"><div class="task-card-header"><div><div class="task-num">2</div><div class="task-card-icon">⚖️</div></div><span class="task-week">4 апта</span></div><div class="task-card-body"><div class="task-card-name">Дәстүрлі және ЖИ негізіндегі оқытуды салыстыру</div><span class="task-type-tag">БӨЖ (АБ1)</span><div class="task-card-result">📋 Салыстырмалы Mind map Whimsical платформасында дайындалды</div><button class="open-detail-btn">Толығырақ қарау →</button></div></div>
+        <div class="task-card" onclick="showTask(3)"><div class="task-card-header"><div><div class="task-num">3</div><div class="task-card-icon">🧠</div></div><span class="task-week">5 апта</span></div><div class="task-card-body"><div class="task-card-name">Адаптивті интеллектуалды оқыту моделі</div><span class="task-type-tag">БӨЖ (АБ1)</span><div class="task-card-result">📋 Адаптивті оқыту моделінің толық схемасы мен Google Docs құжаты</div><button class="open-detail-btn">Толығырақ қарау →</button></div></div>
+        <div class="task-card" onclick="showTask(4)"><div class="task-card-header"><div><div class="task-num">4</div><div class="task-card-icon">🏆</div></div><span class="task-week">7 апта</span></div><div class="task-card-body"><div class="task-card-name">Интеллектуалды есеп шығару жүйесі — Физика олимпиадасы</div><span class="task-type-tag">АБ2 – Прак</span><div class="task-card-result">📋 Интерактивті олимпиада есептер жүйесі Lovable-де жасалды</div><button class="open-detail-btn">Толығырақ қарау →</button></div></div>
+        <div class="task-card" onclick="showTask(5)"><div class="task-card-header"><div><div class="task-num">5</div><div class="task-card-icon">🔬</div></div><span class="task-week">8 апта</span></div><div class="task-card-body"><div class="task-card-name">Физикалық процестерді модельдеу — Оптика / Термодинамика</div><span class="task-type-tag">АБ2 – Прак</span><div class="task-card-result">📋 Оптика интерактивті модельдеу платформасы Lovable-де жасалды</div><button class="open-detail-btn">Толығырақ қарау →</button></div></div>
+        <div class="task-card" onclick="showTask(6)"><div class="task-card-header"><div><div class="task-num">6</div><div class="task-card-icon">⚛️</div></div><span class="task-week">10 апта</span></div><div class="task-card-body"><div class="task-card-name">ЖИ негізінде физика сабағын жобалау — Атом физикасы</div><span class="task-type-tag">БӨЖ (АБ2)</span><div class="task-card-result">📋 Атом физикасы бойынша интерактивті оқыту платформасы іске қосылды</div><button class="open-detail-btn">Толығырақ қарау →</button></div></div>
+        <div class="task-card" onclick="showTask(7)"><div class="task-card-header"><div><div class="task-num">7</div><div class="task-card-icon">🧪</div></div><span class="task-week">12 апта</span></div><div class="task-card-body"><div class="task-card-name">ЖИ қолдайтын виртуалды физика зертханасы — Механика</div><span class="task-type-tag">БӨЖ (АБ2)</span><div class="task-card-result">📋 Механика бойынша виртуалды зертхана Lovable платформасында іске қосылды</div><button class="open-detail-btn">Толығырақ қарау →</button></div></div>
+        <div class="task-card" onclick="showTask(8)"><div class="task-card-header"><div><div class="task-num">8</div><div class="task-card-icon">💡</div></div><span class="task-week">14 апта</span></div><div class="task-card-body"><div class="task-card-name">Физикаға арналған тиімді Prompt жүйесін әзірлеу</div><span class="task-type-tag">БӨЖ (АБ2 – Қорытынды)</span><div class="task-card-result">📋 AI Mechanics Mentor – prompt жүйесі Lovable-де жасалды</div><button class="open-detail-btn">Толығырақ қарау →</button></div></div>
+      </div>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- TASK 1 -->
+  <div id="page-task-1" class="page">
+    <div class="task-page-header">
+      <div class="task-page-nav"><button class="back-btn" onclick="showPage('tasks')">← Тапсырмалар</button><span class="task-page-crumb">/ Тапсырма 1</span></div>
+      <div class="task-page-badge">🤖 2 апта · АБ1 – Прак</div>
+      <div class="task-page-icon">🤖</div>
+      <div class="task-page-title">Физиканы оқытуда жасанды интеллект технологияларының рөлі</div>
+    </div>
+    <div class="task-page-body">
+      <div class="meta-grid">
+        <div class="meta-block"><div class="meta-block-label">Тапсырма түрі</div><div class="meta-block-val">Практикалық жұмыс (АБ1 – Прак)</div></div>
+        <div class="meta-block"><div class="meta-block-label">Оқу нәтижелері</div><div class="meta-block-val">ОН 1, 2, 3, 4</div></div>
+        <div class="meta-block"><div class="meta-block-label">Қолданылған құралдар</div><div class="meta-block-val">ChatGPT, DeepSeek, Canva</div></div>
+        <div class="meta-block"><div class="meta-block-label">Бағалау</div><div class="meta-block-val">Мини-зерттеу есебі (5–6 бет), ғылыми тіл, салыстырмалы талдау, дереккөздермен жұмыс. Жалпы балл: 100</div></div>
+      </div>
+      <div class="meta-block" style="margin-bottom:18px;"><div class="meta-block-label">Мақсаты</div><div class="meta-block-val">ЖИ технологияларын (Machine Learning, Neural Networks, Expert Systems) сипаттау; физиканы оқыту үдерісінде қолдану мүмкіндіктері мен шектеулерін талдау</div></div>
+      <div class="result-box">📋 <strong>Нәтиже:</strong> ЖИ технологияларының жіктемесі мен салыстырмалы талдауы жасалды, Canva инфографикасы дайындалды</div>
+      <a href="https://canva.link/kdng2hthav7iuac" target="_blank" class="open-link-btn">Жұмысты ашу ↗</a>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- TASK 2 -->
+  <div id="page-task-2" class="page">
+    <div class="task-page-header">
+      <div class="task-page-nav"><button class="back-btn" onclick="showPage('tasks')">← Тапсырмалар</button><span class="task-page-crumb">/ Тапсырма 2</span></div>
+      <div class="task-page-badge">⚖️ 4 апта · БӨЖ (АБ1)</div>
+      <div class="task-page-icon">⚖️</div>
+      <div class="task-page-title">Дәстүрлі және ЖИ негізіндегі оқытуды салыстыру</div>
+    </div>
+    <div class="task-page-body">
+      <div class="meta-grid">
+        <div class="meta-block"><div class="meta-block-label">Тапсырма түрі</div><div class="meta-block-val">БӨЖ (АБ1)</div></div>
+        <div class="meta-block"><div class="meta-block-label">Оқу нәтижелері</div><div class="meta-block-val">ОН 1, 2, 3, 4</div></div>
+        <div class="meta-block"><div class="meta-block-label">Қолданылған құралдар</div><div class="meta-block-val">Whimsical платформасы</div></div>
+        <div class="meta-block"><div class="meta-block-label">Бағалау</div><div class="meta-block-val">ЖИ алгоритмдері дұрыс қолданылған, идея педагогикалық тұрғыдан негізделген. Жалпы балл: 100</div></div>
+      </div>
+      <div class="meta-block" style="margin-bottom:18px;"><div class="meta-block-label">Мақсаты</div><div class="meta-block-val">Идеялық жоба (mind map + mockup): ЖИ алгоритмдері (ML, NLP, адаптивті жүйе) мен идея физиканы оқытудың нақты проблемасын шешуге бағытталған</div></div>
+      <div class="result-box">📋 <strong>Нәтиже:</strong> Салыстырмалы Mind map Whimsical платформасында дайындалды</div>
+      <a href="https://whimsical.com/ainamkoz7/BShSF2pCENnFLPrNXQV83d" target="_blank" class="open-link-btn">Жұмысты ашу ↗</a>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- TASK 3 -->
+  <div id="page-task-3" class="page">
+    <div class="task-page-header">
+      <div class="task-page-nav"><button class="back-btn" onclick="showPage('tasks')">← Тапсырмалар</button><span class="task-page-crumb">/ Тапсырма 3</span></div>
+      <div class="task-page-badge">🧠 5 апта · БӨЖ (АБ1)</div>
+      <div class="task-page-icon">🧠</div>
+      <div class="task-page-title">Адаптивті интеллектуалды оқыту моделі</div>
+    </div>
+    <div class="task-page-body">
+      <div class="meta-grid">
+        <div class="meta-block"><div class="meta-block-label">Тапсырма түрі</div><div class="meta-block-val">БӨЖ (АБ1)</div></div>
+        <div class="meta-block"><div class="meta-block-label">Оқу нәтижелері</div><div class="meta-block-val">ОН 1, 2, 4, 5, 6</div></div>
+        <div class="meta-block"><div class="meta-block-label">Қолданылған құралдар</div><div class="meta-block-val">ChatGPT, Claude, Decision Tree / KNN, NLP модельдері</div></div>
+        <div class="meta-block"><div class="meta-block-label">Бағалау</div><div class="meta-block-val">Жүйенің архитектуралық схемасы, логикалық алгоритм, педагогикалық тиімділік талдауы. Топта 3–4 магистрант. Жалпы балл: 100</div></div>
+      </div>
+      <div class="meta-block" style="margin-bottom:18px;"><div class="meta-block-label">Мақсаты</div><div class="meta-block-val">Оқушының бастапқы білім деңгейін анықтайтын диагностикалық модель; оқу траекториясын автоматты бейімдейтін ЖИ логикасын сипаттау</div></div>
+      <div class="result-box">📋 <strong>Нәтиже:</strong> Адаптивті оқыту моделінің толық схемасы мен Google Docs құжаты дайындалды</div>
+      <a href="https://1drv.ms/w/c/16e88863962d977c/IQChS2s5jDGdT6dPMB28nX37Ac6KXBu36wBdauD2UDU1kDc" target="_blank" class="open-link-btn">Жұмысты ашу ↗</a>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- TASK 4 -->
+  <div id="page-task-4" class="page">
+    <div class="task-page-header">
+      <div class="task-page-nav"><button class="back-btn" onclick="showPage('tasks')">← Тапсырмалар</button><span class="task-page-crumb">/ Тапсырма 4</span></div>
+      <div class="task-page-badge">🏆 7 апта · АБ2 – Прак</div>
+      <div class="task-page-icon">🏆</div>
+      <div class="task-page-title">Интеллектуалды есеп шығару жүйесі — Физика олимпиадасы</div>
+    </div>
+    <div class="task-page-body">
+      <div class="meta-grid">
+        <div class="meta-block"><div class="meta-block-label">Тапсырма түрі</div><div class="meta-block-val">Практикалық жұмыс (АБ2 – Прак)</div></div>
+        <div class="meta-block"><div class="meta-block-label">Оқу нәтижелері</div><div class="meta-block-val">ОН 1, 2, 3, 4, 5</div></div>
+        <div class="meta-block"><div class="meta-block-label">Қолданылған құралдар</div><div class="meta-block-val">ChatGPT (NLP), Claude, Rule-based + LLM</div></div>
+        <div class="meta-block"><div class="meta-block-label">Бағалау</div><div class="meta-block-val">ЖИ жұмыс логикасы, кате классификациясы, педагогикалық қорытынды. Топта 3–4 магистрант. Жалпы балл: 100</div></div>
+      </div>
+      <div class="meta-block" style="margin-bottom:18px;"><div class="meta-block-label">Мақсаты</div><div class="meta-block-val">Физикалық есеп түрін таңдау (динамика, оптика), ЖИ-дың шешу жолын тексеру алгоритмін құру; есеп типтерін жіктеу (концептуалды, математикалық)</div></div>
+      <div class="result-box">📋 <strong>Нәтиже:</strong> Интерактивті олимпиада есептер жүйесі Lovable платформасында жасалды</div>
+      <a href="https://id-preview--929d730f-24e2-40bb-a9d3-1963040db083.lovable.app/fizika-olimp.html" target="_blank" class="open-link-btn">Жұмысты ашу ↗</a>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- TASK 5 -->
+  <div id="page-task-5" class="page">
+    <div class="task-page-header">
+      <div class="task-page-nav"><button class="back-btn" onclick="showPage('tasks')">← Тапсырмалар</button><span class="task-page-crumb">/ Тапсырма 5</span></div>
+      <div class="task-page-badge">🔬 8 апта · АБ2 – Прак</div>
+      <div class="task-page-icon">🔬</div>
+      <div class="task-page-title">Физикалық процестерді модельдеу — Оптика / Термодинамика</div>
+    </div>
+    <div class="task-page-body">
+      <div class="meta-grid">
+        <div class="meta-block"><div class="meta-block-label">Тапсырма түрі</div><div class="meta-block-val">Практикалық жұмыс (АБ2 – Прак)</div></div>
+        <div class="meta-block"><div class="meta-block-label">Оқу нәтижелері</div><div class="meta-block-val">ОН 1, 2, 3, 4, 5</div></div>
+        <div class="meta-block"><div class="meta-block-label">Қолданылған құралдар</div><div class="meta-block-val">Python, Scikit-learn, AutoML, Claude, Lovable</div></div>
+        <div class="meta-block"><div class="meta-block-label">Бағалау</div><div class="meta-block-val">Модель сипаттамасы (симуляция, адаптивті тест), нәтижелер, әдістемелік жоба. Жалпы балл: 100</div></div>
+      </div>
+      <div class="meta-block" style="margin-bottom:18px;"><div class="meta-block-label">Мақсаты</div><div class="meta-block-val">Еркін түсу, электр тізбегіндегі ток күші, температуралық тәуелділікті болжау. Python (Scikit-learn), Excel, AutoML немесе онлайн ЖИ платформаларын пайдалану</div></div>
+      <div class="result-box">📋 <strong>Нәтиже:</strong> Оптика интерактивті модельдеу платформасы Lovable-де жасалды</div>
+      <a href="https://refract-and-learn.lovable.app/" target="_blank" class="open-link-btn">Жұмысты ашу ↗</a>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- TASK 6 -->
+  <div id="page-task-6" class="page">
+    <div class="task-page-header">
+      <div class="task-page-nav"><button class="back-btn" onclick="showPage('tasks')">← Тапсырмалар</button><span class="task-page-crumb">/ Тапсырма 6</span></div>
+      <div class="task-page-badge">⚛️ 10 апта · БӨЖ (АБ2)</div>
+      <div class="task-page-icon">⚛️</div>
+      <div class="task-page-title">ЖИ негізінде физика сабағын жобалау — Атом физикасы</div>
+    </div>
+    <div class="task-page-body">
+      <div class="meta-grid">
+        <div class="meta-block"><div class="meta-block-label">Тапсырма түрі</div><div class="meta-block-val">БӨЖ (АБ2)</div></div>
+        <div class="meta-block"><div class="meta-block-label">Оқу нәтижелері</div><div class="meta-block-val">ОН 1, 2, 3, 4, 6</div></div>
+        <div class="meta-block"><div class="meta-block-label">Қолданылған құралдар</div><div class="meta-block-val">ChatGPT, Lovable, Canva, Claude</div></div>
+        <div class="meta-block"><div class="meta-block-label">Бағалау</div><div class="meta-block-val">Mockup прототип, ЖИ логикасының блок-схемасы. Жалпы балл: 100</div></div>
+      </div>
+      <div class="meta-block" style="margin-bottom:18px;"><div class="meta-block-label">Мақсаты</div><div class="meta-block-val">ЖИ негізінде физика сабағын жобалау: ЖИ құралын сипаттау (чат-бот, симуляция, адаптивті тест); сабақ мақсатын педагогикалық тұрғыдан негіздеу</div></div>
+      <div class="result-box">📋 <strong>Нәтиже:</strong> Атом физикасы бойынша интерактивті оқыту платформасы Lovable-де іске қосылды</div>
+      <a href="https://id-preview--929d730f-24e2-40bb-a9d3-1963040db083.lovable.app/atom-physics.html" target="_blank" class="open-link-btn">Жұмысты ашу ↗</a>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- TASK 7 (no link) -->
+  <div id="page-task-7" class="page">
+    <div class="task-page-header">
+      <div class="task-page-nav"><button class="back-btn" onclick="showPage('tasks')">← Тапсырмалар</button><span class="task-page-crumb">/ Тапсырма 7</span></div>
+      <div class="task-page-badge">🧪 12 апта · БӨЖ (АБ2)</div>
+      <div class="task-page-icon">🧪</div>
+      <div class="task-page-title">ЖИ қолдайтын виртуалды физика зертханасы — Механика</div>
+    </div>
+    <div class="task-page-body">
+      <div class="meta-grid">
+        <div class="meta-block"><div class="meta-block-label">Тапсырма түрі</div><div class="meta-block-val">БӨЖ (АБ2)</div></div>
+        <div class="meta-block"><div class="meta-block-label">Оқу нәтижелері</div><div class="meta-block-val">ОН 1, 2, 4, 6</div></div>
+        <div class="meta-block"><div class="meta-block-label">Қолданылған құралдар</div><div class="meta-block-val">Lovable, Claude, Rule-based AI / ML, Симуляция + эксперттік жүйе</div></div>
+        <div class="meta-block"><div class="meta-block-label">Бағалау</div><div class="meta-block-val">Mockup прототип нұсқаулығы. Топта 3–4 магистрант. Жалпы балл: 100</div></div>
+      </div>
+      <div class="meta-block" style="margin-bottom:18px;"><div class="meta-block-label">Мақсаты</div><div class="meta-block-val">ЖИ негізінде виртуалды физика зертханасын жасау: тәжірибені анықтайтын сценарийін жасау; автоматты қате анықтайтын ЖИ модулін жобалау</div></div>
+      <div class="result-box">📋 <strong>Нәтиже:</strong> Механика бойынша виртуалды зертхана Lovable платформасында іске қосылды</div>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- TASK 8 -->
+  <div id="page-task-8" class="page">
+    <div class="task-page-header">
+      <div class="task-page-nav"><button class="back-btn" onclick="showPage('tasks')">← Тапсырмалар</button><span class="task-page-crumb">/ Тапсырма 8</span></div>
+      <div class="task-page-badge">💡 14 апта · БӨЖ (АБ2 – Қорытынды)</div>
+      <div class="task-page-icon">💡</div>
+      <div class="task-page-title">Физикаға арналған тиімді Prompt жүйесін әзірлеу</div>
+    </div>
+    <div class="task-page-body">
+      <div class="meta-grid">
+        <div class="meta-block"><div class="meta-block-label">Тапсырма түрі</div><div class="meta-block-val">БӨЖ (АБ2 – Қорытынды)</div></div>
+        <div class="meta-block"><div class="meta-block-label">Оқу нәтижелері</div><div class="meta-block-val">ОН 1, 2, 4, 6</div></div>
+        <div class="meta-block"><div class="meta-block-label">Қолданылған құралдар</div><div class="meta-block-val">ChatGPT, Claude, Lovable, Prompt testing әдістері</div></div>
+        <div class="meta-block"><div class="meta-block-label">Бағалау</div><div class="meta-block-val">Prompt тиімділігін сараптау, салыстырмалы талдау, әдістемелік ұсыныс. Жалпы балл: 100</div></div>
+      </div>
+      <div class="meta-block" style="margin-bottom:18px;"><div class="meta-block-label">Мақсаты</div><div class="meta-block-val">Физика тақырыбына арналған prompt шаблондарын жасау; Bloom таксономиясы бойынша prompt генерациялау; LLM сараптамасы; ChatGPT мен Claude-ды салыстыру</div></div>
+      <div class="result-box">📋 <strong>Нәтиже:</strong> AI Mechanics Mentor – физика оқытуға арналған prompt жүйесі Lovable-де жасалды</div>
+      <a href="https://id-preview--d0569ada-b1fc-4421-9c5c-501ac52d0934.lovable.app/physicsprompt.html" target="_blank" class="open-link-btn">Жұмысты ашу ↗</a>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- RESEARCH -->
+  <div id="page-research" class="page">
+    <div class="section">
+      <div class="section-label">Ғылыми бөлім</div>
+      <div class="section-title">Зерттеу талдауы</div>
+      <div class="section-title-line"></div>
+      <div class="research-grid">
+        <div class="research-card">
+          <div class="research-card-header"><span class="research-card-icon">✅</span><span class="research-card-title">Артықшылықтары</span></div>
+          <div class="research-items">
+            <div class="research-item">Оқытуды жекелендіру мүмкіндігі</div>
+            <div class="research-item">Нақты уақыттағы кері байланыс</div>
+            <div class="research-item">Жұмыстың автоматтандырылуы</div>
+            <div class="research-item">Күрделі тақырыптарды визуализациялау</div>
+            <div class="research-item">Оқушының уақытын үнемдеу</div>
+          </div>
+        </div>
+        <div class="research-card">
+          <div class="research-card-header"><span class="research-card-icon">⚠️</span><span class="research-card-title">Шектеулері</span></div>
+          <div class="research-items">
+            <div class="research-item">Интернетке тәуелділік</div>
+            <div class="research-item">Ақпараттың дәлдік мәселесі</div>
+            <div class="research-item">Мұғалімнің рөлін алмастыра алмауы</div>
+            <div class="research-item">Практикалық дағдыларды дамытпауы</div>
+            <div class="research-item">Мектептердегі инфрақұрылым жетіспеушілігі</div>
+          </div>
+        </div>
+      </div>
+      <div class="impact-box">
+        <div class="impact-box-title">🎓 Білім беру саласындағы әсері</div>
+        <p>Жасанды интеллект технологиялары физика пәнін оқытуда революциялық өзгеріс әкеледі. Адаптивті оқыту жүйелері әр оқушының деңгейіне сай материал ұсына отырып, білімді меңгеру сапасын арттырады. ЖИ негізіндегі виртуалды зертханалар физикалық тәжірибелерді қауіпсіз және тиімді жүргізуге мүмкіндік береді.</p>
+      </div>
+      <div class="section-label" style="margin-bottom:9px;">Салыстырмалы кесте</div>
+      <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--navy);margin-bottom:16px;">ЖИ құралдарын салыстыру</div>
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead><tr><th>Құрал</th><th>Негізгі қызметі</th><th>Физикадағы қолданысы</th><th>Тиімділік</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tool-badge">ChatGPT</span></td><td>Мәтін генерациясы</td><td>Есеп шығару, түсіндіру, сабақ жоспары</td><td><span class="stars">★★★★★</span></td></tr>
+            <tr><td><span class="tool-badge">Claude</span></td><td>Талдау және зерттеу</td><td>Ғылыми мәтін талдауы, prompt жүйесі</td><td><span class="stars">★★★★★</span></td></tr>
+            <tr><td><span class="tool-badge">Canva</span></td><td>Визуализация</td><td>Инфографика, схема, презентация</td><td><span class="stars">★★★★</span></td></tr>
+            <tr><td><span class="tool-badge">Lovable</span></td><td>Веб-платформа</td><td>Виртуалды зертхана, цифрлық ресурс</td><td><span class="stars">★★★★</span></td></tr>
+            <tr><td><span class="tool-badge">Python/ML</span></td><td>ML модельдеу</td><td>Физикалық процестерді болжау</td><td><span class="stars">★★★★</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · Шымкент, 2026</p></footer>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div id="page-conclusion" class="page">
+    <div class="conclusion-section">
+      <div class="section-label">Жиынтық</div>
+      <div class="section-title">Қорытынды</div>
+      <div class="section-title-line"></div>
+      <div class="conclusion-box">
+        <div class="conclusion-icon">🏆</div>
+        <div class="conclusion-title">Жобаның жалпы нәтижесі</div>
+        <div class="conclusion-text">Бұл жоба барысында жасанды интеллект технологияларын физика сабақтарына кіріктіру тиімділігі тәжірибе жүзінде зерттелді. Сегіз тапсырманың әрқайсысы ЖИ-дың оқу үрдісіндегі нақты мүмкіндіктерін — диагностикадан виртуалды зертханаға, prompt инженериясынан адаптивті модельге дейін — айқын көрсетті. Нәтижесінде физика білімін беру үшін тұтас цифрлық платформа қалыптасты.</div>
+        <div class="conclusion-badges">
+          <span class="conclusion-badge">8 тапсырма орындалды</span>
+          <span class="conclusion-badge">5 ЖИ құралы меңгерілді</span>
+          <span class="conclusion-badge">Цифрлық платформа іске қосылды</span>
+          <span class="conclusion-badge">Зерттеу мақсаты жүзеге асырылды</span>
+        </div>
+      </div>
+    </div>
+    <footer><p>Маликова Айнамкөз Сағитқызы · М1502-15 · 7М01502 – Физика педагогін даярлау</p><p style="margin-top:4px;">Ө.Жәнібеков атындағы Оңтүстік Қазақстан педагогикалық университеті · Шымкент, 2026</p></footer>
+  </div>
+
+</main>
+</div>
+
+<script>
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item, .nav-item-task').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelector('.main').scrollTop = 0;
+  document.querySelectorAll('.nav-item').forEach(a => {
+    if (a.getAttribute('onclick') && a.getAttribute('onclick').includes("'" + name + "'")) {
+      a.classList.add('active');
+    }
+  });
+}
+function showTask(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item, .nav-item-task').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-task-' + n).classList.add('active');
+  document.querySelector('.main').scrollTop = 0;
+  const taskLinks = document.querySelectorAll('.nav-item-task');
+  if (taskLinks[n-1]) taskLinks[n-1].classList.add('active');
+}
+</script>
+</body>
+</html>
